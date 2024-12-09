@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ledClock-user-manual.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="ledclock-user-manual">ledClock user manual</h1>
+<h2 id="general">General</h2>
+<p>The ledClock is an &quot;internet clock&quot;, you cannot expressly set the time, it has to get the time from the internet:</p>
+<ul>
+<li>at boot-up to get the time initially</li>
+<li>about once an hour thereafter to check the time</li>
+</ul>
+<p>For this reason the ledClock requires access to a wifi network which has access to the internet.</p>
+<p><em>Note: The ledClock only uses the 2.4GHz wifi band.</em></p>
+<p>Notes:</p>
+<ul>
+<li>immediately after boot-up, before the time is known to the clock, the digit displays will not show anything useful (and may even be a bit flickery)</li>
+<li>the whole thing looks a bit flakey until it has both wifi &amp; internet connection <em>and</em> has successfully fetched the time at least once</li>
+<li>if there is no wifi connection then the display-panel will seem to be stuck (but the UI will still work and give you access to the menus - pretty essential as you will need to configure the wifi (unless you do it via the serial's CLI)</li>
+<li>the clock is hard-coded to get the time from <code>pool.ntp.org</code></li>
+</ul>
+<h2 id="user-interface">User interface</h2>
+<p>The controls for the ledClock consist of:</p>
+<ul>
+<li>a knob</li>
+<li>and, oh, a plug you can yank out of the mains supply</li>
+</ul>
+<p>The knob is a <em>rotary-encoder</em> it has the following capabilities:</p>
+<ul>
+<li>it turns freely (and indefinitely)</li>
+<li>it can be pressed, either briefly (a click) or held down</li>
+<li>in some situations rotating the knob while pressed is used to adjust values in bigger steps (to more quickly make adjustments to items that have a wide range of values)</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h3 id="when-not-in-the-menu-system"><strong>when not in the menu system:</strong></h3>
+<ul>
+<li>
+<h4 id="normal-click-brief-press--release">normal-click (brief press &amp; release)</h4>
+<ul>
+<li>to enter the menu system</li>
+<li>to start/pause/restart a currently active timer</li>
+<li>if a timer has expired then dismisses the timer alarm (stops it flashing/buzzing) and returns to the normal time display</li>
+</ul>
+</li>
+<li>
+<h4 id="long-click-keep-pressed">long-click (keep pressed)</h4>
+<ul>
+<li>cancel a currently active timer (whether paused or running)</li>
+</ul>
+</li>
+<li>
+<h4 id="rotate-forwardsbackwards">rotate forwards/backwards</h4>
+<ul>
+<li>to cycle through time/date&lt;/timer&gt; digit displays
+<ul>
+<li>after a timeout period of 10 seconds, the digit displays will return to either the time or a currently active timer</li>
+</ul>
+</li>
+<li>to adjust the remaining time of a currently active timer (if it's in the paused state)</li>
+</ul>
+</li>
+</ul>
+<h3 id="when-in-the-menu-system"><strong>when in the menu system:</strong></h3>
+<ul>
+<li>
+<h4 id="normal-click-brief-press--release">normal-click (brief press &amp; release)</h4>
+<ul>
+<li>to select the currently highlighted menu item, either to enter a submenu or to start adjusting some value
+<ul>
+<li>note: if the top item of a menu (its title) is highlighted then a click exits that menu (or the whole menu system itself, if at the main menu)</li>
+</ul>
+</li>
+<li>to activate one of the preset timers (on the main menu), this exits the menu system and puts the active timer into its paused state, ready for (a temporary) adjustment and/or starting</li>
+<li>to finish adjusting some value</li>
+</ul>
+</li>
+<li>
+<h4 id="long-click-keep-pressed">long-click (keep pressed)</h4>
+<ul>
+<li>only used at the main menu when the currently highlighted item is one of the preset timers; used to enter a menu for that timer so you can adjust the timer's configured preset value &amp; its buzzer duration</li>
+</ul>
+</li>
+<li>
+<h4 id="rotate-forwardsbackwards">rotate forwards/backwards</h4>
+<ul>
+<li>to move the current menu highlight</li>
+<li>to make adjustments to some selected value</li>
+</ul>
+</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h3 id="menus">Menus</h3>
+<h4 id="general-usage">General usage</h4>
+<p>There are various ways each menu item acts:</p>
+<ul>
+<li>enter a submenu (or exit this menu if on the menu title)</li>
+<li>enable/disable toggle (like a checkbox)</li>
+<li>enable/disable/select one of a mutually exclusive group (like an option but with ability to un-select all options)</li>
+<li>enable/disable toggle + submenu
+<ul>
+<li>this acts like a three-way toggle, click once to enable (if disabled), click again to enter submenu (for further options), click a third time immediately after exiting the submenu to disable (it's awkward, but it kinda works).</li>
+<li>if you navigate away from the item and return to it then the next click takes you into the submenu immediately. The item can only be disabled by clicking immediately after returning from the submenu and not navigating away.</li>
+</ul>
+</li>
+<li>value adjust (like a slider)</li>
+</ul>
+<h4 id="menu-specifics">Menu specifics</h4>
+<ul>
+<li>
+<h4 id="main-menu-for-some-reason-titled-%22options%22">main menu (for some reason titled &quot;OPTIONS&quot;)</h4>
+<ul>
+<li>quick access to 5 preset timers (<strong>t0</strong>-<strong>t4</strong>); single click to activate the timer, long-press to adjust the timer's configuration (not detailed here)
+<ul>
+<li>when a timer is activated it starts in the paused state, you can adjust the timer period (without affecting the preset) by rotating the knob if required, click again to start/pause/restart timer</li>
+</ul>
+</li>
+<li><strong>configure &gt;</strong> enter the <strong>configuration menu</strong></li>
+</ul>
+</li>
+<li>
+<h4 id="configuration-menu">configuration menu</h4>
+<ul>
+<li>3 submenus for individual <strong>time</strong>/<strong>date</strong>/<strong>timer</strong> configuration menus</li>
+<li><strong>display &gt;</strong> enter the display panel colour scheme menu (to choose menu colour scheme, not detailed here)</li>
+<li><strong>system &gt;</strong> enter <strong>system configuration</strong> menu (to set brightness/wifi)</li>
+</ul>
+</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<ul>
+<li>
+<h4 id="timedatetimer-configuration-menus---general">time/date/timer configuration menus - <em>general</em>:</h4>
+<ul>
+<li><strong>seriffed</strong> toggle whether the digits should have serifs</li>
+<li><strong>softened</strong> toggle whether the digits should have soft corners</li>
+<li><strong>effects &gt;</strong> enable/disable &amp; enter digit effects menu (digit transition effects, not detailed here, just play with it)</li>
+<li><strong>colour 1 &gt;</strong> submenu for start (of day/year/timer) hue &amp; saturation</li>
+<li><strong>colour 2 &gt;</strong> submenu for end (of day/year/timer) hue &amp; saturation
+<ul>
+<li>the digit's hue/saturation at any given moment is determined by where we are in the day/year/timer, interpolating between colours 1 &amp; 2. If you want just one colour throughout the whole period, you have to set colour 1 &amp; 2 to the same hue &amp; saturation values</li>
+</ul>
+</li>
+<li><strong>more... &gt;</strong>
+<ul>
+<li><strong>colour test</strong> shows a slider that lets you preview the colour-1 --&gt; colour-2 interpolation</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<h4 id="time-menu----more">time menu --&gt; more</h4>
+<p>The <strong>time menu</strong> has extra items in the <strong>more</strong> menu:</p>
+<ul>
+<li><strong>+1hour (dst)</strong> toggle whether daylight savings is in force</li>
+<li><strong>time zone</strong> choose your time-zone (offset from UTC)</li>
+</ul>
+</li>
+<li>
+<h4 id="system-menu">system menu</h4>
+<ul>
+<li><strong>brightness &gt;</strong> enter <strong>brightness menu</strong></li>
+<li><strong>wifi &gt;</strong> enter <strong>wifi</strong> configuration menu</li>
+<li><strong>reboot</strong> does what is says on the tin</li>
+</ul>
+</li>
+<li>
+<h4 id="brightness-menu">brightness menu</h4>
+<ul>
+<li><strong>set min &gt;</strong> enter submenu to set the minimum brightness values to be used when the room is darkest, for both the digit-displays &amp; display-panel</li>
+<li><strong>set max &gt;</strong> enter submenu to set the maximum brightness values to be used when the room is brightest, for both the digit-displays &amp; display-panel</li>
+<li><strong>smoothing</strong> adjust how smoothly/slowly the brightnesses change when the ambient lighting changes</li>
+<li><strong>daylight+</strong> enable/disable daylight boost &amp; enter submenu to configure daylight boost values and configure how daylight is defined</li>
+</ul>
+</li>
+</ul>
+ <div style="page-break-after: always;"></div>
+<ul>
+<li>
+<h4 id="daylight-menu">daylight+ menu</h4>
+<p><em>Note: adjust the digit &amp; panel boost values actually during daylight hours, else you won't know how much to boost by, if at all</em></p>
+<ul>
+<li><strong>digits</strong> adjust boost value for digit-displays</li>
+<li><strong>panel</strong> adjust boost value for display-panel</li>
+<li><strong>latitude</strong> set your location's latitude (degrees +/-ve)</li>
+<li><strong>longitude</strong> set your location's longitude (degrees +/-ve)</li>
+<li><strong>sun altitude</strong> set how far above (+ve) or below (-ve) the horizon that the sun needs to be (higher than) in order to be deemed &quot;bright daylight&quot;</li>
+</ul>
+<p><strong>A description of how the brightness system works is given further below.</strong></p>
+</li>
+<li>
+<h4 id="wifi-menu">wifi menu</h4>
+<p>This displays current wifi values and connection status, with one clickable submenu:</p>
+<ul>
+<li><strong>configure &gt;</strong> enter submenu to configure or forget wifi settings</li>
+</ul>
+</li>
+<li>
+<h4 id="wifi-configure-menu">wifi configure menu</h4>
+<p>This all pretty self explanatory, noting that:</p>
+<ul>
+<li>&quot;n/w name&quot; means the SSID of the local wifi network</li>
+<li>&quot;password&quot; means whatever password value is used by the network</li>
+<li>&quot;my name&quot; is the name of the ledClock and defines how it appears to the n/w (eg: in the router's list of DHCP leases)</li>
+</ul>
+</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h2 id="how-the-brightness-system-works">How the brightness system works</h2>
+<p><em>Note: for longevity of the LEDs (and so things don't melt) it is recommended to not run them extremely bright, best to make them as dim as you can whilst still being at an acceptable and comfortable viewing brightness</em></p>
+<p><em>Note: recommended you set the digit-display brightness value first and then adjust the display-panel brightness to get a similar luminance.</em></p>
+<h3 id="automatic-ambient-adjust">automatic ambient adjust</h3>
+<p>You do not explicitly set a certain brightness for the digit-displays or display-panel. Instead you define how bright you want each to be when the ambient light is at its darkest and how bright you want each to be when the ambient light is at its brightest. As you set either the <strong>minimum</strong> or the <strong>maximum</strong> values the system remembers the ambient light level as measured at that moment - and also the brightness values you have defined. Once the minimum and maximum are set the system will interpolate between your lowest &amp; highest brightness values according to the current ambient lighting conditions.</p>
+<p><strong>So</strong>:</p>
+<ul>
+<li>set the minimums when the room is at its (expected) darkest</li>
+<li>set the maximums when the room is at its (expected) brightest</li>
+<li>you can go back and adjust one or the other later, should the room become much darker/brighter than before - or if you just want it brighter/darker</li>
+</ul>
+<h3 id="daylight-boosts-brightnesses-during-daylight-hours">daylight+ (boosts brightnesses during daylight hours)</h3>
+<p>For the most part this automatic ambient adjust works well. However there are some situations when things don't work so well... in particular if there is a window in the room which causes a strong reflection on the glass cloches making the digits difficult to discern. This is what the <strong>daylight+</strong> is all about - to allow you to have boosted brightness values during daylight hours.</p>
+<div style="page-break-after: always;"></div>
+<h2 id="serial-interface--cli-for-nerds">serial interface &amp; cli (for nerds)</h2>
+<p>The serial port is used for:</p>
+<ul>
+<li>displaying / setting selected configuration parameters</li>
+<li>view any debug log lines</li>
+<li>reprogramming (requires specialist knowledge &amp; s/w)</li>
+</ul>
+<p>Access to serial interface is via the usb-C connector on the main controller unit (remove the cap for access).</p>
+<p>When using the serial port the ledClock will be powered by whatever the usb cable is connected to, eg: your PC, so:</p>
+<p><strong>Always</strong>: unplug the ledClock from the mains</p>
+<p><strong>Very highly recommended</strong>: disconnect the 5v power lead (black+red) that runs between the PSU and the distribution board (hub), otherwise the circuitry inside the PSU may act as a sink for the voltage being supplied down the usb cable from your PC. This might, just might, damage the PC but at the very least it could cause the supply voltage to drop and the LEDs may be dimmer than normal and/or cause other anomalies (don't forget to reconnect this lead afterwards).</p>
+<p>Serial is <strong>115200</strong>, <strong>8</strong>, <strong>1</strong> (if you don't know what that means then you probably shouldn't be doing this)</p>
+<p>Once the system is booted, hitting [return] should show a prompt:<br>
+<code>&gt;_</code></p>
+<p>You may see logging lines appear, depending on the state of the system - and the state of the code that runs on it.</p>
+<h3 id="cli-commands">cli commands</h3>
+<p>There are only a few cli commands, mostly used for debugging.</p>
+<p>In most cases where a value can be displayed and/or set, the general format is:<br>
+<code>&lt;command&gt; [&lt;new value&gt;]</code><br>
+or<br>
+<code>&lt;command&gt; &lt;sub-command&gt; [&lt;new value&gt;]</code>\</p>
+<p>If the <code>&lt;new value&gt;</code> is absent then the existing value is displayed and it does not get altered.</p>
+<p>All commands/sub-commands are case sensitive.</p>
+<p><code>buz [on]</code> set the buzzer on (anything but <code>on</code> causes buzzer to stop)</p>
+<p><code>dd cc &lt;new colour-correction value&gt;</code> digit-display colour-correction; set (only, no display) LED colour correction value; format RRGGBB (or maybe GGRRBB, it might depend on the LED type, I forget). Hex pairs. Best not to touch. Was needed for leds WS2812 (and not WS2812B)</p>
+<p><code>dd cc reset</code> digit-display colour-correction; reset colour-correction to the default value defined for the led-type used (in case you ignored my &quot;best not to touch&quot; above)</p>
+<div style="page-break-after: always;"></div>
+<p><code>door [&lt;0|1&gt;]</code> set door not-present/is-present; &quot;is-present&quot; only makes sense if the ledClock actually has a servo activating a door (in front of the display-panel), only one such ledClock exists and it probably isn't yours, so ignore this command unless you want to do something else with the servo signal. When the UI is activated the servo is given a certain defined pulse width and when the UI is de-activated the servo is given a different pulse width. When door-present is true a couple of extra menu items are added to the system-menu to allow tweaking of the servo pulse widths for door open and door closed.</p>
+<p><code>lm mode [&lt;new mode&gt;]</code> light-meter mode (exact meaning not detailed here, this is for proper nerds who will have to look at the code). Likely put in during the s/w development phase and got forgotten.</p>
+<p><code>lm mt [&lt;new mt register value&gt;]</code> light-meter MT register value (exact meaning not detailed here, this is for proper nerds who will have to look at the code). Likely put in during the s/w development phase and got forgotten.</p>
+<p><code>rst</code> restart (boot)</p>
+<p><code>tt tz [&lt;new time-zone&gt;]</code> the time's timezone (an index value, I think)</p>
+<p><code>tt dst [&lt;0|1&gt;]</code> whether daylight saving is in force</p>
+<p><code>tt day [&lt;0|1&gt;]</code> if true (<code>1</code>) then forces the clock to think we are in daylight regardless of the actual time</p>
+<p><code>tt reset</code> clear any stored time configuration (causes defaults to be used on next boot).</p>
+<p><code>ui to [&lt;value ms&gt;]</code> user-interface timeout in milliseconds, <code>0</code>=do not timeout (useful during development of UI etc)</p>
+<p><code>wifi</code> display wifi SSID, pwd &amp; hostname (aka: my name, eg: &quot;ledClock&quot;), also shows wifi status. <strong>Warning: password will be displayed in plaintext</strong></p>
+<p><code>wifi hostname [&lt;new hostname&gt;]</code> display/set how the ledClock appears to the n/w</p>
+<p><code>wifi ssid [&lt;new ssid&gt;]</code> display/set network SSID</p>
+<p><code>wifi pwd [&lt;new password&gt;]</code> display/set wifi password. <strong>Warning: password will be displayed in plaintext</strong></p>
+<p><code>wifi forget</code> &amp; <code>wifi reset</code> two different ways of forgetting and clearing the wifi credentials. I do not know why there are two different ways to do this, they are subtly different for reasons I cannot fathom right now.</p>
+<p><code>wifi diag</code> display some wifi diagnostics (not sure it's particularly revealing)</p>
+
+</body>
+</html>

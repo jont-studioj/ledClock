@@ -1,0 +1,47 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "ledClockRemote",
+			"path": "../ledClockRemote"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"array": "cpp",
+			"*.tcc": "cpp",
+			"memory": "cpp",
+			"istream": "cpp",
+			"functional": "cpp",
+			"tuple": "cpp",
+			"utility": "cpp",
+			"atomic": "cpp",
+			"cstdint": "cpp",
+			"random": "cpp",
+			"ctime": "cpp",
+			"type_traits": "cpp",
+			"iomanip": "cpp",
+			"limits": "cpp",
+			"numeric": "cpp",
+			"streambuf": "cpp",
+			"deque": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"vector": "cpp",
+			"string_view": "cpp",
+			"initializer_list": "cpp",
+			"new": "cpp",
+			"algorithm": "cpp",
+			"cmath": "cpp",
+			"optional": "cpp",
+			"ostream": "cpp",
+			"system_error": "cpp",
+			"sstream": "cpp",
+			"fstream": "cpp",
+			"wifi.h": "c"
+		}
+	}
+}

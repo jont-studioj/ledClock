@@ -1,0 +1,261 @@
+
+
+in		out
++ red				need to be disconnectable inside case
+- blk
+
+rot a yel
+rot b yel
+rot sw blk
+
+		led sig		yel
+		buzzer		white
+		servo sig	orange
+
++light sensor
+
+
+
+#define TFT_WIDTH  135
+#define TFT_HEIGHT 240
+
+
+tft lum 
+
+
+top	timer: 00:00
+	timer: 00:00
+	timer: 00:00
+	timer: 00:00
+	timer: 00:00
+	setup		time		-->	UiMenuDigitModeSettings(time)	+ TZ+DST
+			date		-->	UiMenuDigitModeSettings(date)
+			timer		-->	UiMenuDigitModeSettings(timer)
+
+			brightness	-->	some menu+ to do with brightness / dimming
+			wifi		-->	some menu+ to do with wifi setup
+
+
+
+
+time	colours
+	TZ + DST
+
+date	colours
+	format
+
+timer	preset list
+	colours
+
+
+
+
+menuBack
+focusRing
+
+titleBack
+titleFore
+
+unselectedBack
+unselectedFore
+
+selectedBack
+selectedFore
+
+
+struct ColourData {
+  bool enabled;
+  int16_t hue;      // 0..255 twice over
+  uint8_t sat;      // 0..255
+};
+
+struct DigitDisplayModeData {
+idx
+  DigitDisplayMode digitDisplayMode;
+  const char *name;
+  bool seriffed;
+  bool softened;
+  bool fxEnabled;
+  bool fxGrow;
+  bool fxShrink;
+  bool fxFadeIn;      // if both fade in and fade out are set
+  bool fxFadeOut;     // then treat as crossfade and ignore fxExpand/fxShrink
+  ColourData colourData1;
+  ColourData colourData2;
+};
+
+
+virtual void initMenuContent();
+
+virtual void menuItemOptionChange(UiMenuItem *menuItem);
+
+  virtual void showThyself(bool bRepaint);
+  virtual void hideThyself(bool bRepaint);
+  virtual void activateThyself(bool bRepaint);
+  virtual void deactivateThyself(bool bRepaint);
+  virtual void showItemFocus(bool bRepaint);
+virtual void paintMenuContent(bool bRepaint, bool bAsActive);
+  virtual UiEvent processMenuExit(UiLowLevelEventSource lowLevelEventSource);
+  virtual UiEvent processMenuEnter(UiLowLevelEventSource lowLevelEventSource);
+  virtual UiEvent processMenuDecrease(UiLowLevelEventSource lowLevelEventSource);
+  virtual UiEvent processMenuIncrease(UiLowLevelEventSource lowLevelEventSource);
+
+clientTop	27
+uint8_t textTp = clientTop + 2;					29
+uint8_t textHt = 26;
+uint8_t barBorderTp = textTp + textHt + 4;	29+26+4		59
+
+
+timerMenu
+
+->	start/pause
+	stop
+	set preset
+	[x] buzzer
+
+
+
+
+
+
+************************************************************
+************************************************************
+************************************************************
+really need to fix the shitty NTP fetch
+- make async
+************************************************************
+************************************************************
+************************************************************
+
+
+
+
+
+
+
+--------------------
+
+--------------------
+
+
+
+private:
+  static const uint8_t textLt = 0;
+  static const uint8_t textWd = TFT_WIDTH;
+  static const uint8_t textTp = clientTop + 2;
+  static const uint8_t textHt = 26;
+
+  static const uint8_t fontNo = 4;
+
+  static const uint16_t maxHueVal = 256*2;
+
+  static const uint8_t barBorderLt = 3;
+  static const uint8_t barBorderWd = 129;
+  static const uint8_t barBorderTp = textTp + textHt + 4;
+  static const uint8_t barBorderHt = TFT_HEIGHT - barBorderTp;
+
+  static const uint8_t barFillLt = barBorderLt + 1;
+  static const uint8_t barFillWd = barBorderWd - 2;
+  static const uint8_t barFillTp = barBorderTp + 1;
+  static const uint8_t barFillHt = barBorderHt - 2;
+
+//  static CRGB[barFillHt] 
+//  CRGB palette[QTY_LEDS];
+
+  static const uint8_t myValueMin = 0;
+  static const uint8_t myValueMax = 180;
+  static const uint8_t myValueRange = myValueMax - myValueMin;
+
+
+  
+  
+  
+  
+In setup()...
+servo duty:4670
+wifiManager: WS_null --> WS_disconnected
+Input via: rot-encoder
+...done setup()
+WifiManager::loop(): WS_disconnected
+WifiManager::connect()
+wifiManager: WS_disconnected --> WS_connecting
+main-loop: newWifiState:WS_connecting
+wifiManager: WS_connecting --> WS_connection_failed
+main-loop: newWifiState:WS_connection_failed
+WifiManager::checkWifiState(): wlStatus=3
+wifiManager: WS_connection_failed --> WS_connected
+main-loop: newWifiState:WS_connected
+TimeSource::kickstartNtpClientEtc()
+Update from NTP Server...
+[  8140][E][WiFiUdp.cpp:170] beginPacket(): could not get host from dns: 11
+NTP err: Could not send packet
+NTP time = 00:00:08
+                TimeSource::syncProvider()
+RtcGet(): rtcEpoch=1352
+Getting NTP...Update from NTP Server...
+[ 15140][E][WiFiUdp.cpp:170] beginPacket(): could not get host from dns: 11
+NTP err: Could not send packet
+Invalid NTP response, using RTC time
+ui.getUiState()=0
+servo duty:5650
+
+
+
+**********************************************************************************************
+**********************************************************************************************
+why does it immediately retry ntp get after the failure?
+**********************************************************************************************
+**********************************************************************************************
+
+also, are we checking for connect-status too soon after connect attempt?
+
+
+pow((float)i / (float)max_in, gamma) * max_out + 0.5));
+
+
+=\left(\left(\frac{x}{255}\right)^{g}\cdot253+2\right)
+
+((x/255)**gamma ) * 253 + 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+retreat	/ advance 
+
+retard / advance
+
+decrease / increase
+
+
+
+
+
+struct DisplayPanelColourScheme {
+  uint8_t idx;
+  const char *name;						classic		amber
+  uint16_t menuBg;			UIMENU_COL_BKG		TFT_BLACK	TFT_BLACK
+  uint16_t focusRing;			UIMENU_COL_FOCUS_RING	TFT_CYAN	0xf62b
+  uint16_t titleBg;			UIMENU_COL_TITLE_BKG	TFT_DARKCYAN	0xbc24
+  uint16_t titleFg;			UIMENU_COL_TITLE_FGD	TFT_WHITE	TFT_WHITE
+  uint16_t unselectedBg;		UIMENU_ITEM_COL_BKG_A	TFT_BLACK	TFT_BLACK	
+  uint16_t unselectedFg;		UIMENU_ITEM_COL_FGD_A	0xce79		0xd5ac
+  uint16_t selectedBg;			UIMENU_ITEM_COL_BKG_A_S	0x4208		0x4208
+  uint16_t selectedFg;			UIMENU_ITEM_COL_FGD_A_S	0xe73c		0xfeef
+
+
+};
+
+
+
+
+
