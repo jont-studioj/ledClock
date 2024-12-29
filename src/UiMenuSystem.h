@@ -8,6 +8,7 @@ public:
   using UiMenu::UiMenu;
 
   void initMenuContent();
+  void paintMenuContent(bool bRepaint, bool bAsActive);
   void menuItemOptionChange(UiMenuItem *menuItem);
   
 private:

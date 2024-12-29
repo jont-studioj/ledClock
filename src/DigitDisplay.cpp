@@ -17,6 +17,7 @@ void DigitDisplay::begin(RefProvider *refProvider) {
 
   lerpTestVal = -1;
 
+  bDoingSoakTest = false;
   bDoingGammaValueAdjust = false;
 
   // set some initial flashing vars
@@ -272,22 +273,46 @@ void DigitDisplay::setRgbCorrection(uint32_t value, bool bSave) {
   }
 }
 
+void DigitDisplay::setDoingCommissioningTypeAdjustments(bool value) {
+  if ( value ) {
+    blankAllLeds();
+    tempDisableAmbientAutoAdjust(true);
+  } else {
+    invalidateAllDigits();
+    blankAllLeds();
+    resetAnimationData();
+    actualLedBrightness = 0;  // deeply hacky, this forces the change to happen (I should code this better)
+    tempDisableAmbientAutoAdjust(false);
+  }
+}
+
+void DigitDisplay::setSoakTestMode(bool value) {
+  if ( bDoingSoakTest != value ) {
+    bDoingSoakTest = value;
+    setDoingCommissioningTypeAdjustments(bDoingSoakTest);
+    if ( bDoingSoakTest ) {
+      soakTestIdx = 0;
+      soakTestHueDir = 1;
+      soakTestHueVal = 0;
+      soakTestSatDir = 1;
+      soakTestSatVal = 0;
+      soakTestLumDir = 1;
+      soakTestLumVal = 0;
+      // starting gamma value adjust
+      FastLED.setBrightness(255);
+      paintPixelsWithGammaGradient();
+    }
+  }
+}
+
 void DigitDisplay::setDoingGammaValueAdjust(bool value) {
   if ( bDoingGammaValueAdjust != value ) {
     bDoingGammaValueAdjust = value;
+    setDoingCommissioningTypeAdjustments(bDoingGammaValueAdjust);
     if ( bDoingGammaValueAdjust ) {
       // starting gamma value adjust
-      blankAllLeds();
-      tempDisableAmbientAutoAdjust(true);
       FastLED.setBrightness(255);
       paintPixelsWithGammaGradient();
-    } else {
-      // ending gamma value adjust
-      invalidateAllDigits();
-      blankAllLeds();
-      resetAnimationData();
-      actualLedBrightness = 0;  // deeply hacky, this forces the change to happen (I should code this better)
-      tempDisableAmbientAutoAdjust(false);
     }
   }
 }
@@ -302,6 +327,46 @@ float DigitDisplay::getGammaValue() {
   return gammaValue;
 }
 
+void DigitDisplay::paintPixelsWithSoakTest() {
+  // hacky soak test mode...
+  soakTestIdx++;
+  if ( soakTestIdx % 13 ) {
+    soakTestSatVal += soakTestSatDir;
+    if ( soakTestSatVal > 255 ) {
+      soakTestSatVal = 255;
+      soakTestSatDir = -soakTestSatDir;
+    } else if ( soakTestSatVal < 0 ) {
+      soakTestSatVal = 0;
+      soakTestSatDir = -soakTestSatDir;
+    }
+  }
+  if ( soakTestIdx % 17 ) {
+    soakTestLumVal += soakTestLumDir;
+    if ( soakTestLumVal > 255 ) {
+      soakTestLumVal = 255;
+      soakTestLumDir = -soakTestLumDir;
+    } else if ( soakTestLumVal < 0 ) {
+      soakTestLumVal = 0;
+      soakTestLumDir = -soakTestLumDir;
+    }
+  }
+  if ( soakTestIdx % 23 ) {
+    soakTestHueVal += soakTestHueDir;
+    if ( soakTestHueVal > 255 ) {
+      soakTestHueVal = 255;
+      soakTestHueDir = -soakTestHueDir;
+    } else if ( soakTestHueVal < 0 ) {
+      soakTestHueVal = 0;
+      soakTestHueDir = -soakTestHueDir;
+    }
+  }
+  //Serial.printf("idx=%d, hue=%d, sat=%d, lum=%d\n", soakTestIdx, soakTestHueVal, soakTestSatVal, soakTestLumVal);
+  // fill all pixels with identical varying hue/sat/lum
+  for (uint16_t pixelIdx = 0; pixelIdx < QTY_LEDS; pixelIdx++) {
+    ledBuffer[pixelIdx].setHSV(soakTestHueVal, soakTestSatVal, soakTestLumVal);
+  }
+}
+
 void DigitDisplay::paintPixelsWithGammaGradient() {
   // hacky gamma adjust mode...
   // fill 101 pixels with (user brightness) 0-100 each passed through gammaCorrect()
@@ -310,7 +375,6 @@ void DigitDisplay::paintPixelsWithGammaGradient() {
     uint8_t gcVal = gammaCorrect(pixelIdx);
     ledBuffer[pixelIdx].setRGB(gcVal, gcVal, gcVal);
   }
-
 }
 
 //todo: need to call this on change? AND after ambientAdjust (but what if there no ambient adjust happens after the crossover to/from daylight?)
@@ -856,13 +920,17 @@ void DigitDisplay::applyActiveDigitDisplayModeSettings() {
 // main loop
 // ********************************************************************************************************************************
 void DigitDisplay::loop() {
-  if ( updatesEnabled && !bDoingGammaValueAdjust ) {
-    doTickingUpdate();
+  if ( updatesEnabled ) {
+    if ( bDoingSoakTest ) {
+      paintPixelsWithSoakTest();
+    } else if ( !bDoingGammaValueAdjust ) {
+      doTickingUpdate();
 
-    doDigitAnimations(!bFlashing);   // if flashing then immediate draw (no animations)
-    doPixelAnimations(!bFlashing);   // if flashing then immediate draw (no animations)
+      doDigitAnimations(!bFlashing);   // if flashing then immediate draw (no animations)
+      doPixelAnimations(!bFlashing);   // if flashing then immediate draw (no animations)
 
-    seekTargetLedBrightness();
+      seekTargetLedBrightness();
+    }
   }
 }
 // ********************************************************************************************************************************

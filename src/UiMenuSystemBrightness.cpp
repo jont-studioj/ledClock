@@ -100,7 +100,7 @@ void UiMenuSystemBrightness::paintMenuContent(bool bRepaint, bool bAsActive) {
   // (yes, I know that leaves an unreferenced object, but don't care right now)
   // enable commissioning mode by holding the button down while booting
   if ( !refProvider.sundries.bCommissioningMode ) {
-Serial.println("Hiding gamma adjust");
+    //Serial.println("Hiding gamma adjust");
     uiMenuItems[itemIdxSetGamma] = NULL;
   }
 
