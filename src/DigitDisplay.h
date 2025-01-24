@@ -106,6 +106,7 @@ public:
   void setRgbCorrection(uint32_t value, bool bSave);
 
   void setSoakTestMode(bool value);
+  void setNycMode(bool value);
 
   void setDoingGammaValueAdjust(bool value);
   void setGammaValue(float value, bool bRepaint = true);
@@ -184,7 +185,7 @@ void dump(uint8_t digitIdx);
   void setThisDigitWithThisDigitValue(uint8_t digitIdx, uint8_t digitValue);
 
   bool bDebug = false;
-
+  
 //TODO: should really be private and have getter/setters
 //they are public at the moment so main cli stuff can futz with them
 uint8_t pixelAnimStepsFadeIn = 20;
@@ -237,13 +238,15 @@ private:
   uint32_t rgbCorrection = RGB_CORRECTION;
 
   bool bDoingSoakTest;
-  uint16_t soakTestIdx;
-  int8_t soakTestHueDir;
-  int16_t soakTestHueVal;
-  int8_t soakTestSatDir;
-  int16_t soakTestSatVal;
-  int8_t soakTestLumDir;
-  int16_t soakTestLumVal;
+  bool bDoingNYC;
+  uint16_t nycCurrentYear;
+  uint16_t colourSweepIdx;
+  int8_t colourSweepHueDir;
+  int16_t colourSweepHueVal;
+  int8_t colourSweepSatDir;
+  int16_t colourSweepSatVal;
+  int8_t colourSweepLumDir;
+  int16_t colourSweepLumVal;
   
 
   // some hacky overriding flag to indicate we're doing gamma value adjust
@@ -286,9 +289,11 @@ private:
   const uint32_t flashPhaseDurationMS = 500;
   uint32_t flashPhaseChangeTimeMS;
 
-  void setDoingCommissioningTypeAdjustments(bool value);
+  void setDoingAbnormalOperation(bool value);
 
-  void paintPixelsWithSoakTest();
+  void initialiseColourSweep();
+  void doColourSweep();
+
   void paintPixelsWithGammaGradient();
 
   uint8_t gammaCorrect(uint8_t inputBrightess);

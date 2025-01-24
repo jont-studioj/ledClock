@@ -49,7 +49,7 @@ void setup() {
   displayPanel.setRotation(2);       // 2=portrait but inverted from normal
 
   displayPanel.setTextColor(TFT_WHITE, TFT_BLACK);
-  displayPanel.setCursor(0, 0, 2);
+  displayPanel.setCursor(0, 0, 4);
   displayPanel.println("setup...");
 
 
@@ -81,7 +81,7 @@ void maybeCycleDigitDisplayMode(int8_t direction) {
   DigitDisplayMode digitDisplayMode = refProvider.digitDisplay.getActiveDigitDisplayMode();
   // only do digit display mode cycling if we not editing a time value
   // nor are we sitting at an expired timer
-  if ( (digitDisplayMode != DigitDisplayModeEdit) &&  (timeSource.selectedTimerExpired() == false) ) {
+  if ( (digitDisplayMode != DigitDisplayModeEdit) && (timeSource.selectedTimerExpired() == false) ) {
     digitDisplay.cycleDigitDisplayMode(direction);
     // tell sundries that the digit separator needs to be redrawn
     refProvider.sundries.redrawDigitSeparator();
@@ -99,11 +99,13 @@ void loop() {
     switch ( highLevelUiEvent ) {
     case UiEvent::ueUiStarted: 
       sev = "ueUiStarted";
+      digitDisplay.setNycMode(false);
       dispModeChanged = digitDisplay.autoSelectDigitDisplayMode();
       sundries.displayDoor_open(true);
       break;
     case UiEvent::ueUiStopped: 
       sev = "ueUiStopped";
+      digitDisplay.setNycMode(false);
       if ( timeSource.getSelectedTimer() == -1 ) {
         dispModeChanged = digitDisplay.autoSelectDigitDisplayMode();
       }
@@ -149,8 +151,8 @@ void loop() {
       sev = "ueMenuDeactivating";
       break;
     }
-    //Serial.print("UI.highLevelEvent=");
-    //Serial.println(sev);
+    // Serial.print("UI.highLevelEvent=");
+    // Serial.println(sev);
 
     // pass any UiEvent to the time source
     timeSource.processUiEvent(highLevelUiEvent);

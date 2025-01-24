@@ -488,7 +488,7 @@ void Sundries::lightMeter_setSmoothingQtySamples(uint8_t value) {
   } else if ( value > 10 ) {
     value = 10;
   }
-  if ( lightMeter_qtySamples != value ) {;
+  if ( lightMeter_qtySamples != value ) {
     lightMeter_qtySamples = value;
     lightMeter_damped_sample = 0.0f;
     lightMeter_runningSampleSum = 0.0f;

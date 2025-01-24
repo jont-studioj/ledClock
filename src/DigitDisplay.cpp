@@ -18,6 +18,8 @@ void DigitDisplay::begin(RefProvider *refProvider) {
   lerpTestVal = -1;
 
   bDoingSoakTest = false;
+  bDoingNYC = false;
+  nycCurrentYear = 0;
   bDoingGammaValueAdjust = false;
 
   // set some initial flashing vars
@@ -273,7 +275,7 @@ void DigitDisplay::setRgbCorrection(uint32_t value, bool bSave) {
   }
 }
 
-void DigitDisplay::setDoingCommissioningTypeAdjustments(bool value) {
+void DigitDisplay::setDoingAbnormalOperation(bool value) {
   if ( value ) {
     blankAllLeds();
     tempDisableAmbientAutoAdjust(true);
@@ -289,18 +291,47 @@ void DigitDisplay::setDoingCommissioningTypeAdjustments(bool value) {
 void DigitDisplay::setSoakTestMode(bool value) {
   if ( bDoingSoakTest != value ) {
     bDoingSoakTest = value;
-    setDoingCommissioningTypeAdjustments(bDoingSoakTest);
+    setDoingAbnormalOperation(bDoingSoakTest);
     if ( bDoingSoakTest ) {
-      soakTestIdx = 0;
-      soakTestHueDir = 1;
-      soakTestHueVal = 0;
-      soakTestSatDir = 1;
-      soakTestSatVal = 0;
-      soakTestLumDir = 1;
-      soakTestLumVal = 0;
-      // starting gamma value adjust
-      FastLED.setBrightness(255);
-      paintPixelsWithGammaGradient();
+      initialiseColourSweep();
+      // set all leds to be some non-zero value to indicate they should be swept
+      for (uint16_t pixelIdx = 0; pixelIdx < QTY_LEDS; pixelIdx++) {
+        ledBuffer[pixelIdx].setHSV(0, 0, 1);
+      }
+    }
+  }
+}
+
+void DigitDisplay::setNycMode(bool value) {
+  if ( bDoingNYC != value ) {
+    bDoingNYC = value;
+    setDoingAbnormalOperation(bDoingNYC);
+    if ( bDoingNYC ) {
+      initialiseColourSweep();
+      // set leds appropriate for year to be some non-zero value to indicate they should be swept
+
+      // get year to display
+      uint16_t year = refProvider->timeSource.getYear();
+      const LedDigitStyleStruct *digitData = ledDefsGetDigitStyle(true);
+
+      for (uint8_t digitIdx = 0; digitIdx < QTY_DIGITS; digitIdx++) {
+        // get this digit's value...
+        uint8_t digitValue = year % 10;   // ...take the year's unit value...
+        year /= 10;                       // ...then dividing the year by 10 repeatedly
+
+        uint16_t startingDigitPixelIdx = digitIdx * QTY_LEDS_PER_DIGIT;
+        for (uint16_t digitPixelOffset = 0; digitPixelOffset < QTY_LEDS_PER_DIGIT; digitPixelOffset++) {
+          uint16_t pixelIdx = startingDigitPixelIdx + digitPixelOffset;                                       // absolute dest pixel index
+          uint16_t pixelDefPair = digitData->digitDefs[digitValue][digitPixelOffset];                         // this is pair of pixel values, in MSB & LSB
+          // the pixelDefPair contains encoded info regarding aninamtion...
+          // ...but we actually don't care about the animation values, 
+          // just whether the pixel has some non-zero value
+          // which indicates that it forms part of the digit
+          if ( pixelDefPair != 0 ) {
+            ledBuffer[pixelIdx].setHSV(0, 0, 1);
+          }
+        }
+      }
     }
   }
 }
@@ -308,7 +339,7 @@ void DigitDisplay::setSoakTestMode(bool value) {
 void DigitDisplay::setDoingGammaValueAdjust(bool value) {
   if ( bDoingGammaValueAdjust != value ) {
     bDoingGammaValueAdjust = value;
-    setDoingCommissioningTypeAdjustments(bDoingGammaValueAdjust);
+    setDoingAbnormalOperation(bDoingGammaValueAdjust);
     if ( bDoingGammaValueAdjust ) {
       // starting gamma value adjust
       FastLED.setBrightness(255);
@@ -327,43 +358,59 @@ float DigitDisplay::getGammaValue() {
   return gammaValue;
 }
 
-void DigitDisplay::paintPixelsWithSoakTest() {
-  // hacky soak test mode...
-  soakTestIdx++;
-  if ( soakTestIdx % 13 ) {
-    soakTestSatVal += soakTestSatDir;
-    if ( soakTestSatVal > 255 ) {
-      soakTestSatVal = 255;
-      soakTestSatDir = -soakTestSatDir;
-    } else if ( soakTestSatVal < 0 ) {
-      soakTestSatVal = 0;
-      soakTestSatDir = -soakTestSatDir;
+void DigitDisplay::initialiseColourSweep() {
+  colourSweepIdx = 0;
+  colourSweepHueDir = 1;
+  colourSweepHueVal = 0;
+  colourSweepSatDir = 1;
+  colourSweepSatVal = 0;
+  colourSweepLumDir = 1;
+  // Note, we avoid using a zero lum value as we are using
+  // a non-zero value to indicate which leds are to be swept
+  colourSweepLumVal = 1;
+  FastLED.setBrightness(255);
+}
+
+void DigitDisplay::doColourSweep() {
+  colourSweepIdx++;
+  if ( colourSweepIdx % 13 ) {
+    colourSweepSatVal += colourSweepSatDir;
+    if ( colourSweepSatVal > 255 ) {
+      colourSweepSatVal = 255;
+      colourSweepSatDir = -colourSweepSatDir;
+    } else if ( colourSweepSatVal < 0 ) {
+      colourSweepSatVal = 0;
+      colourSweepSatDir = -colourSweepSatDir;
     }
   }
-  if ( soakTestIdx % 17 ) {
-    soakTestLumVal += soakTestLumDir;
-    if ( soakTestLumVal > 255 ) {
-      soakTestLumVal = 255;
-      soakTestLumDir = -soakTestLumDir;
-    } else if ( soakTestLumVal < 0 ) {
-      soakTestLumVal = 0;
-      soakTestLumDir = -soakTestLumDir;
+  if ( colourSweepIdx % 17 ) {
+    colourSweepLumVal += colourSweepLumDir;
+    if ( colourSweepLumVal > 255 ) {
+      colourSweepLumVal = 255;
+      colourSweepLumDir = -colourSweepLumDir;
+    } else if ( colourSweepLumVal < 1 ) {
+      // Note, we avoid going down to zero lum as we are using
+      // a non-zero value to indicate which leds are to be swept
+      colourSweepLumVal = 1;
+      colourSweepLumDir = -colourSweepLumDir;
     }
   }
-  if ( soakTestIdx % 23 ) {
-    soakTestHueVal += soakTestHueDir;
-    if ( soakTestHueVal > 255 ) {
-      soakTestHueVal = 255;
-      soakTestHueDir = -soakTestHueDir;
-    } else if ( soakTestHueVal < 0 ) {
-      soakTestHueVal = 0;
-      soakTestHueDir = -soakTestHueDir;
+  if ( colourSweepIdx % 23 ) {
+    colourSweepHueVal += colourSweepHueDir;
+    if ( colourSweepHueVal > 255 ) {
+      colourSweepHueVal = 255;
+      colourSweepHueDir = -colourSweepHueDir;
+    } else if ( colourSweepHueVal < 0 ) {
+      colourSweepHueVal = 0;
+      colourSweepHueDir = -colourSweepHueDir;
     }
   }
-  //Serial.printf("idx=%d, hue=%d, sat=%d, lum=%d\n", soakTestIdx, soakTestHueVal, soakTestSatVal, soakTestLumVal);
-  // fill all pixels with identical varying hue/sat/lum
+  //Serial.printf("idx=%d, hue=%d, sat=%d, lum=%d\n", colourSweepIdx, colourSweepHueVal, colourSweepSatVal, colourSweepLumVal);
+  // fill all non-zero pixels with identical varying hue/sat/lum
   for (uint16_t pixelIdx = 0; pixelIdx < QTY_LEDS; pixelIdx++) {
-    ledBuffer[pixelIdx].setHSV(soakTestHueVal, soakTestSatVal, soakTestLumVal);
+    if ( ledBuffer[pixelIdx] != 0 ) {
+      ledBuffer[pixelIdx].setHSV(colourSweepHueVal, colourSweepSatVal, colourSweepLumVal);
+    }
   }
 }
 
@@ -781,33 +828,36 @@ bool DigitDisplay::autoSelectDigitDisplayMode() {
 }
 
 void DigitDisplay::cycleDigitDisplayMode(int8_t direction) {
-  DigitDisplayMode newMode = activeDigitDisplayMode;
-  if ( direction < 0 ) {
-    switch (activeDigitDisplayMode) {
-    case DigitDisplayModeTime:
-      newMode = (refProvider->timeSource.getSelectedTimer() == -1) ? DigitDisplayModeDate : DigitDisplayModeTimer;
-      break;
-    case DigitDisplayModeDate:
-      newMode = DigitDisplayModeTime;
-      break;
-    case DigitDisplayModeTimer:
-      newMode = DigitDisplayModeDate;
-      break;
+  // ignore this if we are in soaktest or nyc mode
+  if ( !bDoingSoakTest && !bDoingNYC ) {
+    DigitDisplayMode newMode = activeDigitDisplayMode;
+    if ( direction < 0 ) {
+      switch (activeDigitDisplayMode) {
+      case DigitDisplayModeTime:
+        newMode = (refProvider->timeSource.getSelectedTimer() == -1) ? DigitDisplayModeDate : DigitDisplayModeTimer;
+        break;
+      case DigitDisplayModeDate:
+        newMode = DigitDisplayModeTime;
+        break;
+      case DigitDisplayModeTimer:
+        newMode = DigitDisplayModeDate;
+        break;
+      }
+    } else if ( direction > 0 ) {
+      switch (activeDigitDisplayMode) {
+      case DigitDisplayModeTime:
+        newMode = DigitDisplayModeDate;
+        break;
+      case DigitDisplayModeDate:
+        newMode = (refProvider->timeSource.getSelectedTimer() == -1) ? DigitDisplayModeTime : DigitDisplayModeTimer;
+        break;
+      case DigitDisplayModeTimer:
+        newMode = DigitDisplayModeTime;
+        break;
+      }
     }
-  } else if ( direction > 0 ) {
-    switch (activeDigitDisplayMode) {
-    case DigitDisplayModeTime:
-      newMode = DigitDisplayModeDate;
-      break;
-    case DigitDisplayModeDate:
-      newMode = (refProvider->timeSource.getSelectedTimer() == -1) ? DigitDisplayModeTime : DigitDisplayModeTimer;
-      break;
-    case DigitDisplayModeTimer:
-      newMode = DigitDisplayModeTime;
-      break;
-    }
-  }
-  setActiveDigitDisplayMode(newMode, true);
+    setActiveDigitDisplayMode(newMode, true);
+  }//endif not in soaktest/nyc mode
 }
 
 
@@ -921,8 +971,8 @@ void DigitDisplay::applyActiveDigitDisplayModeSettings() {
 // ********************************************************************************************************************************
 void DigitDisplay::loop() {
   if ( updatesEnabled ) {
-    if ( bDoingSoakTest ) {
-      paintPixelsWithSoakTest();
+    if ( bDoingSoakTest || bDoingNYC ) {
+      doColourSweep();
     } else if ( !bDoingGammaValueAdjust ) {
       doTickingUpdate();
 
@@ -989,6 +1039,11 @@ void DigitDisplay::doTickingUpdate() {
   // (things can look odd otherwise, especially on timer expiry)
   bool bNewSecond = false;
   if ( timeSource.timeValid() ) {
+    // get the year so we can notice year change
+    if ( nycCurrentYear == 0 ) {
+      nycCurrentYear = timeSource.getYear();
+    }
+
     uint8_t secsNow = timeSource.getSecondUnits();
     if ( secsNow != previousSecondValue ) {
       bNewSecond = true;
@@ -1026,6 +1081,15 @@ void DigitDisplay::doTickingUpdate() {
 
   // potentially update digits...
   maybeUpdateAllDigits(bNewSecond);
+
+  // if year has changed then initiate nyc
+  if ( bNewSecond ) {
+    uint16_t newYear = timeSource.getYear();
+    if ( newYear != nycCurrentYear ) {
+      nycCurrentYear = newYear;
+      setNycMode(true);
+    }
+  }
 
 }
 
