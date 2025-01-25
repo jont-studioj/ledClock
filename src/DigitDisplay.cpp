@@ -293,7 +293,7 @@ void DigitDisplay::setSoakTestMode(bool value) {
     bDoingSoakTest = value;
     setDoingAbnormalOperation(bDoingSoakTest);
     if ( bDoingSoakTest ) {
-      initialiseColourSweep();
+      initialiseColourSweep(1, 255);
       // set all leds to be some non-zero value to indicate they should be swept
       for (uint16_t pixelIdx = 0; pixelIdx < QTY_LEDS; pixelIdx++) {
         ledBuffer[pixelIdx].setHSV(0, 0, 1);
@@ -307,7 +307,7 @@ void DigitDisplay::setNycMode(bool value) {
     bDoingNYC = value;
     setDoingAbnormalOperation(bDoingNYC);
     if ( bDoingNYC ) {
-      initialiseColourSweep();
+      initialiseColourSweep(24, 160);
       // set leds appropriate for year to be some non-zero value to indicate they should be swept
 
       // get year to display
@@ -358,7 +358,7 @@ float DigitDisplay::getGammaValue() {
   return gammaValue;
 }
 
-void DigitDisplay::initialiseColourSweep() {
+void DigitDisplay::initialiseColourSweep(uint16_t lumValMin, uint16_t lumValMax) {
   colourSweepIdx = 0;
   colourSweepHueDir = 1;
   colourSweepHueVal = 0;
@@ -367,7 +367,12 @@ void DigitDisplay::initialiseColourSweep() {
   colourSweepLumDir = 1;
   // Note, we avoid using a zero lum value as we are using
   // a non-zero value to indicate which leds are to be swept
-  colourSweepLumVal = 1;
+  if ( lumValMin < 1 ) {
+    lumValMin = 1;
+  }
+  colourSweepLumValMin = lumValMin;
+  colourSweepLumValMax = lumValMax;
+  colourSweepLumVal = colourSweepLumValMin;
   FastLED.setBrightness(255);
 }
 
@@ -385,13 +390,11 @@ void DigitDisplay::doColourSweep() {
   }
   if ( colourSweepIdx % 17 ) {
     colourSweepLumVal += colourSweepLumDir;
-    if ( colourSweepLumVal > 255 ) {
-      colourSweepLumVal = 255;
+    if ( colourSweepLumVal > colourSweepLumValMax ) {
+      colourSweepLumVal = colourSweepLumValMax;
       colourSweepLumDir = -colourSweepLumDir;
-    } else if ( colourSweepLumVal < 1 ) {
-      // Note, we avoid going down to zero lum as we are using
-      // a non-zero value to indicate which leds are to be swept
-      colourSweepLumVal = 1;
+    } else if ( colourSweepLumVal < colourSweepLumValMin ) {
+      colourSweepLumVal = colourSweepLumValMin;
       colourSweepLumDir = -colourSweepLumDir;
     }
   }

@@ -247,6 +247,8 @@ private:
   int16_t colourSweepSatVal;
   int8_t colourSweepLumDir;
   int16_t colourSweepLumVal;
+  int16_t colourSweepLumValMin;
+  int16_t colourSweepLumValMax;
   
 
   // some hacky overriding flag to indicate we're doing gamma value adjust
@@ -291,7 +293,7 @@ private:
 
   void setDoingAbnormalOperation(bool value);
 
-  void initialiseColourSweep();
+  void initialiseColourSweep(uint16_t lumValMin, uint16_t lumValMax);
   void doColourSweep();
 
   void paintPixelsWithGammaGradient();
