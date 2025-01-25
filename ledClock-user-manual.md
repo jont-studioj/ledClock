@@ -176,7 +176,7 @@ There are only a few cli commands, mostly used for debugging.
 In most cases where a value can be displayed and/or set, the general format is:\
 `<command> [<new value>]`\
 or\
-`<command> <sub-command> [<new value>]`\
+`<command> <sub-command> [<new value>]`
 
 If the `<new value>` is absent then the existing value is displayed and it does not get altered.
 
